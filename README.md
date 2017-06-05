@@ -134,7 +134,10 @@ array. All variables refer to the __same__ mutable array.
 
 Many developers do not understand the difference between the
 object/instance (the array in this case) and the reference(s) to such
-an object.
+an object. Java uses __by value__ semantics but this description leads
+some developers to believe that `sort(i)` will pass the
+object/value/array to the method and not just the reference to that
+object/value/array.
 
 Here we introduce the `sort` method to further trick the reader: it
 looks like a _pure_ _function_, but it just returns its argument
@@ -153,6 +156,7 @@ well.
 
 [1] https://en.wikipedia.org/wiki/Side_effect_(computer_science)  
 [2] https://clojure.org/reference/data_structures
+[3] http://javadude.com/articles/passbyvalue.htm
 
 ## More on mutable state
 
