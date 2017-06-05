@@ -155,7 +155,7 @@ you get uncontrolled state sharing and side effects in Clojure as
 well.
 
 [1] https://en.wikipedia.org/wiki/Side_effect_(computer_science)  
-[2] https://clojure.org/reference/data_structures
+[2] https://clojure.org/reference/data_structures  
 [3] http://javadude.com/articles/passbyvalue.htm
 
 ## More on mutable state
