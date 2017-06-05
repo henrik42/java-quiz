@@ -140,15 +140,15 @@ object/value/array to the method and not just the reference to that
 object/value/array.
 
 Here we introduce the `sort` method to further trick the reader: it
-looks like a _pure_ _function_, but it just returns its argument
+looks like a _pure function_, but it just returns its argument
 (i.e. the reference to the mutable array) --- well, thank's for that!
 This kind of error (i.e. introducing side effects via state sharing
 between arguments and return values) is done quite often by delevopers
 unintentionally and hard to find.
 
 In Clojure you almost always use immutable data types (including
-immutable collections --- called _persistent_ _data_ _structures_
-[2]). So there is no danger of side effects.
+immutable collections --- called _persistent data structures_ [2]). So
+there is no danger of side effects.
 
 Note: Clojure can use Java's mutable arrays directly and in this case
 you get uncontrolled state sharing and side effects in Clojure as
@@ -176,3 +176,79 @@ mutable state all this will lead to more broken code.
 
 -------------------------------------------------------------------
 
+# Autoboxing
+
+    import static java.lang.System.*;
+
+    class Autoboxing {
+
+        public static void main(String... args) {
+
+            Integer a = 42, b = 42;
+
+            out.println("a == b      : " + (a == b));
+            out.println("a == 42     : " + (a == 42));
+            out.println("a.equals(b) : " + (a.equals(b)));
+
+            Integer c = 666, d = 666;
+
+            out.println("c == d      : " + (c == d));
+            out.println("c == 666    : " + (c == 666));
+            out.println("c.equals(d) : " + (c.equals(d)));
+
+            Boolean t = true, s = true;
+
+            out.println("t == s      : " + (t == s));
+            out.println("t == true   : " + (t == true));
+            out.println("c.equals(d) : " + (c.equals(d)));
+
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac Autoboxing.java
+    ~/java-quiz$ java Autoboxing 
+    a == b      : true
+    a == 42     : true
+    a.equals(b) : true
+    c == d      : false
+    c == 666    : true
+    c.equals(d) : true
+    t == s      : true
+    t == true   : true
+    c.equals(d) : true
+
+## Background
+
+Comparing `a == b` and `c == d` is done with no auto-unboxing: this
+just compares references. `a` and `b` reference __the same cached
+object__ because they are both auto-boxed from `42` via
+`Integer.valueOf(int)` [1]. So they're identical. In my JVM the
+auto-boxed values for `666` are not cached in `Integer` so `c` and `d`
+reference two different instances.
+
+Comparing `a == 42` will auto-unbox `a` and compare the two (native)
+`int` (not `Integer`) values.
+
+Autoboxing seems to give the developer the freedom to mix the use of
+the native types (`int`, `long`, `float`, `double`, `boolean`) and
+their wrapper counterparts (`Integer`etc.) arbitrarily and to
+substitute one for the other.
+
+But:
+
+* boxing und unboxing costs time and space -- so you should only do it
+  when you really need it. Some developers will use `for (Integer i =
+  0; [...])`.
+
+* it introduces the chance to get the comparision wrong (see above) --
+  in this case your code may work for the first 127 test cases but
+  then no more.
+
+* `Double`/`Float` and `double`/`float` have different equals and
+  ordering semantics for `0.0`/`-0.0` and `NaN` [2] which may come as
+  a surprise.
+
+[1] https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html#valueOf-int-  
+[2] https://docs.oracle.com/javase/8/docs/api/java/lang/Double.html#equals-java.lang.Object-
