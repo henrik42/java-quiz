@@ -134,8 +134,8 @@ array. All variables refer to the __same__ mutable array.
 
 Many developers do not understand the difference between the
 object/instance (the array in this case) and the reference(s) to such
-an object. Java uses __by value__ semantics but this description leads
-some developers to believe that `sort(i)` will pass the
+an object. Java uses __by value__ semantics [3] but this description
+leads some developers to believe that `sort(i)` will pass the
 object/value/array to the method and not just the reference to that
 object/value/array.
 
@@ -224,7 +224,7 @@ Build & run:
 Comparing `a == b` and `c == d` is done with no auto-unboxing: this
 just compares references. `a` and `b` reference __the same cached
 object__ because they are both auto-boxed from `42` via
-`Integer.valueOf(int)` [1]. So they're identical. In my JVM the
+`Integer.valueOf(int)` [1]. So they're identical. On my JVM the
 auto-boxed values for `666` are not cached in `Integer` so `c` and `d`
 reference two different instances.
 
