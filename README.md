@@ -289,3 +289,67 @@ In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
 
 -------------------------------------------------------------------
 
+# BooleanQuiz
+
+    import static java.lang.System.*;
+    import static java.lang.Boolean.*;
+
+    class BooleanQuiz {
+
+        public static void main(String... args) {
+
+            boolean a = new Boolean(true);
+            boolean b = new Boolean(true);
+            Boolean A = new Boolean(true);
+            Boolean B = new Boolean(true);
+
+            Boolean C = Boolean.valueOf(true);
+            Boolean D = Boolean.valueOf(true);
+
+            out.println(a == b);
+            out.println(a == B);
+            out.println(A == B);
+
+            out.println(C == D);
+
+            out.println(a == TRUE);
+            out.println(A == TRUE);
+
+            out.println(C == TRUE);
+
+            out.println(A.equals(B));
+            out.println(A.equals(true));
+            out.println(A.equals(TRUE));
+
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac BooleanQuiz.java
+    ~/java-quiz$ java BooleanQuiz 
+    true
+    true
+    false
+    true
+    true
+    false
+    true
+    true
+    true
+    true
+
+## Background
+
+`Boolean` is not a Java 5 Enum class and thus we can use the `public`
+constructor to create instances. When comparing these via `==` for
+__identitiy__ they are different. `equals` and auto-un-boxing behave
+as expected.
+
+In Clojure you use the boolean [1] literals `true` and `false` (which are
+`Boolean.TRUE` and `Boolean.FALSE` ar runtime). Comparision is done via `=`.
+
+[1] https://clojuredocs.org/clojure.core/boolean
+
+-------------------------------------------------------------------
+
