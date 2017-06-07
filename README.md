@@ -141,13 +141,13 @@ object/value/array.
 
 Here we introduce the `sort` method to further trick the reader: it
 looks like a _pure function_, but it just returns its argument
-(i.e. the reference to the mutable array) --- well, thank's for that!
+(i.e. the reference to the mutable array) -- well, thank's for that!
 This kind of error (i.e. introducing side effects via state sharing
 between arguments and return values) is done quite often by delevopers
 unintentionally and hard to find.
 
 In Clojure you almost always use immutable data types (including
-immutable collections --- called _persistent data structures_ [2]). So
+immutable collections -- called _persistent data structures_ [2]). So
 there is no danger of side effects.
 
 Note: Clojure can use Java's mutable arrays directly and in this case
@@ -232,23 +232,60 @@ Comparing `a == 42` will auto-unbox `a` and compare the two (native)
 `int` (not `Integer`) values.
 
 Autoboxing seems to give the developer the freedom to mix the use of
-the native types (`int`, `long`, `float`, `double`, `boolean`) and
-their wrapper counterparts (`Integer`etc.) arbitrarily and to
-substitute one for the other.
+native types (`int`, `long`, `float`, `double`, `boolean`) and their
+wrapper counterparts (`Integer` etc.) arbitrarily and to substitute
+one for the other.
 
 But:
 
 * boxing und unboxing costs time and space -- so you should only do it
   when you really need it. Some developers will use `for (Integer i =
-  0; [...])`.
+  0; [...])` without knowing what they're doing.
 
 * it introduces the chance to get the comparision wrong (see above) --
   in this case your code may work for the first 127 test cases but
   then no more.
 
-* `Double`/`Float` and `double`/`float` have different equals and
+* `Double`/`Float` and `double`/`float` have different `equals` and
   ordering semantics for `0.0`/`-0.0` and `NaN` [2] which may come as
   a surprise.
 
 [1] https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html#valueOf-int-  
 [2] https://docs.oracle.com/javase/8/docs/api/java/lang/Double.html#equals-java.lang.Object-
+
+-------------------------------------------------------------------
+
+# BigIntegerQuiz
+
+    import static java.lang.System.*;
+    import java.math.BigInteger;
+
+    class BigIntegerQuiz {
+
+        public static void main(String... args) {
+
+            BigInteger a = BigInteger.valueOf(Integer.parseInt(args[0]));
+            a.add(BigInteger.valueOf(Integer.parseInt(args[1])));
+
+            out.println(a);
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac BigIntegerQuiz.java
+    ~/java-quiz$ java BigIntegerQuiz 1 2
+    1
+
+## Background
+
+`BigInteger` is an immutable class and `BigInteger.add()` is a _pure
+function_ and not a mutator (like `List.add()`). Readers/Developes may
+not know that and misbelieve that `BigInteger.add()` changes the
+`Integer` instance.
+
+In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
+1)`.
+
+-------------------------------------------------------------------
+
