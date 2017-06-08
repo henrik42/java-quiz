@@ -598,3 +598,103 @@ abstraction and list comprehension.
 [1] https://clojure.org/about/functional_programming#_recursive_looping  
 [2] https://en.wikibooks.org/wiki/Clojure_Programming/Examples/Cookbook#Looping
 
+-------------------------------------------------------------------
+
+# Loops
+
+    import static java.lang.System.*;
+
+    class Loops {
+
+        public static void main(String... args) {
+
+            int[] a = new int[] { 3, 2, 1, 0 };
+
+            int j = 0;
+            do 
+                out.println(j);
+            while (a[j++] != 1);
+
+            for (int i : a)
+                if (i == 1)
+                    continue;
+                else
+                    out.println(a[j]);
+
+            for (int k = 0;; k++)
+                if (a[k] > 2)
+                    out.println(k);
+                else 
+                    break;
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac Loops.java
+    ~/java-quiz$ java Loops 
+    0
+    1
+    2
+    0
+    0
+    0
+    0
+
+## Background
+
+Loops are "fun" in Java if you like. `while` loops do not scope
+looping variables so you have to define them in the surrounding scope
+(which may be larger than you want -- but you can use a block scope).
+
+-------------------------------------------------------------------
+
+# Mutable
+
+    import static java.lang.System.*;
+    import java.util.*;
+
+    class Mutable {
+
+        public static void main(String... args) {
+
+            Set set = new HashSet();
+            String[] strings = new String[] { "zoo", "foo", "bar" };
+            List list = Arrays.asList(strings);
+
+            set.add(list);
+
+            out.println("set.size() = " + set.size());
+            out.println("set = " + Arrays.toString(set.toArray()));
+            out.println("set.contains(list) = " + set.contains(list));
+
+            out.println("list = " + list);
+            Arrays.sort(strings);
+            out.println("list = " + list);
+
+            out.println("set = " + Arrays.toString(set.toArray()));
+            out.println("set.contains(list) = " + set.contains(list));
+
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac Mutable.java
+    ~/java-quiz$ java Mutable 
+    set.size() = 1
+    set = [[zoo, foo, bar]]
+    set.contains(list) = true
+    list = [zoo, foo, bar]
+    list = [bar, foo, zoo]
+    set = [[bar, foo, zoo]]
+    set.contains(list) = false
+
+## Background
+
+Mutable keys are bad for you (`HashSet`, `HashMap`, `TreeSet`). The
+set does not `contains` the element (a `List` in this case) which is
+the first in the set -- "confusing".
+
+-------------------------------------------------------------------
+
