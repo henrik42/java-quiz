@@ -521,3 +521,80 @@ identity check via `==` when comparing Enums.
 
 -------------------------------------------------------------------
 
+# FlowQuiz
+
+    import static java.lang.System.*;
+
+    class FlowQuiz {
+
+        public static void main(String... args) {
+
+            try {
+
+                for (int i : new int[]{ 2, 1, 3 })
+
+                    switch (i) {
+
+                    case 1: 
+                        for (int j = 1; j < 5; j++) {
+                            out.println(j);
+                            if (j == 3) 
+                                break;
+                        }
+                        break;
+
+                    case 3:
+                        for (int j = 1; j < 5; j++) {
+                            if (j == 2) 
+                                return;
+                            out.println(j);
+                        }
+
+                    case 2:
+                        for (int j = 1; j < 5; j++) {
+                            if (j == 2) 
+                                continue;
+                            out.println(j);
+                        }
+
+                    default:
+                        out.println("default");
+
+                    }
+
+                out.println("done");
+            }
+            finally {
+                out.println("finally");
+            }
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac FlowQuiz.java
+    ~/java-quiz$ java FlowQuiz 
+    1
+    3
+    4
+    default
+    1
+    2
+    3
+    1
+    finally
+
+## Background
+
+`switch/case` with _fall-through_ (i.e. with-out `break`) and loops
+with `break` and `continue` are hard to grasp/understand for some
+developers. I didn't even put `break` and `continue` __with labels__
+(_structured goto_) in there (which many developers don't even know
+about).
+
+In Clojure you use _recusive looping_ [1] [2], the sequence
+abstraction and list comprehension.
+
+[1] https://clojure.org/about/functional_programming#_recursive_looping  
+[2] https://en.wikibooks.org/wiki/Clojure_Programming/Examples/Cookbook#Looping
+
