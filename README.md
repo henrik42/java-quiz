@@ -84,7 +84,7 @@ them.
 
 -------------------------------------------------------------------
 
-## ArraySideeffect
+# ArraySideeffect
 
     import static java.lang.System.*;
     import java.util.Arrays;
@@ -407,3 +407,68 @@ In Clojure we have __immutable__ lists and vectors which can be sorted
 (like in `(sort [6 3 4])` which gives `(3 4 6)`).
 
 -------------------------------------------------------------------
+
+# CorefQuiz
+
+    import static java.lang.System.*;
+    import java.util.*;
+
+    class CorefQuiz {
+
+        public static void main(String... args) {
+
+            int[][] i = new int[2][];
+
+            int[] j = new int[] { 1, 2 };
+            i[0] = j;
+
+            out.println(Arrays.deepToString(i));
+
+            j[0]++;
+            j[1]++;
+
+            i[1] = j;
+
+            out.println(Arrays.deepToString(i));
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac CorefQuiz.java 
+    ~/java-quiz$ java CorefQuiz
+    [[1, 2], null]
+    [[2, 3], [2, 3]]
+
+# Background
+
+You cannot only have more than one variable (local on the stack or as
+a class field on the heap) reference the same object but you can also
+have more than one reference __within__ a structure refering to the
+same object. This also introduces the possibility of side effects.
+
+So in this example we have `i` -- an array of `int[]`. So the elements
+of the array that `i` refers to are __references__ (not `int`s!).
+
+So when we make `i[0]` and `i[1]` reference the same object (which is
+an `int[]` in this case) we can then change the `int`s in this array
+and _see_ the effect of the change in more than one place.
+
+So side effects cannot only be introduced by returning argument
+reference values (see above) but also by constructing _co-refering_
+(any better term for this?) object-graphs to mutable objects.
+
+This can introduce subtle bugs. Imagine a _service oriented_
+application where clients (remote and local) call services through
+their interfaces. When a service is called locally or through a remote
+__RMI client__, _co-refering_ object graphs will hit the
+server/implemenation (since RMI's de-serialization preserves the
+_co-refering_ graph-structure). But once you switch to REST or SOAP
+clients the server will see a structure without any
+_co-references_. This may lead to a different program behaviour.
+
+In Clojure you also have _co-references_ but since things are
+__immutable__ they cause no problem.
+
+-------------------------------------------------------------------
+
