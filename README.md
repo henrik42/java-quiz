@@ -736,3 +736,62 @@ Options `// 3` and `// 4` both work.
 In Clojure you use `nil?` without trouble.
 
 -------------------------------------------------------------------
+
+# OverLoad
+
+    import static java.lang.System.*;
+
+    interface X { void foo(Object x); }
+
+    class A implements X { 
+        public void foo(Object x)  { out.println("A1" + x); }
+        public void foo(String x)  { out.println("A2" + x); }
+        public void foo(Integer x) { out.println("A2" + x); }
+        public String toString() { return "A"; }
+    }
+
+    class B implements X { 
+        public void foo(Object x)  { out.println("B1" + x); }
+        public void foo(String x)  { out.println("B2" + x); }
+        public void foo(Integer x) { out.println("B3" + x); }
+        public String toString() { return "B"; }
+    }
+
+    class OverLoad {
+
+        public static void main(String... args) {
+
+            X a = new A();
+            B b = new B();
+
+            a.foo("foo");
+            b.foo("bar");
+
+            a.foo(1);
+            b.foo(2);
+
+            new A().foo("fred");
+            new B().foo(a);
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac OverLoad.java
+    ~/java-quiz$ java OverLoad 
+    A1foo
+    B2bar
+    A11
+    B32
+    A2fred
+    B1A
+
+## Background
+
+_Overloading_ and _overriding_ are confused by many developers. One of
+the frequent error is that developers believe that `a.foo("foo")`
+calls `A.foo(String)` which it doesn't. But in `new A().foo("fred")`
+it does -- of course.
+
+-------------------------------------------------------------------
+
