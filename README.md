@@ -7,11 +7,10 @@ of the Java basics they were using day in day out. So we came up with
 some code examples they could use to check their knowledge. We don't
 use these for job interviews yet.
 
-This repo is a spin-off. I'll add some comments and Clojure [1]
-code. Clojure is a LISP-like functional JVM language. I love Java but
-I believe it has some properties that make it hard to get right. So
-I'll say a little about why certain error/bugs are less likely in
-Clojure than in Java.
+I'll add some comments and Clojure [1] code. Clojure is a LISP-like
+functional JVM language. I love Java but I believe it has some
+properties that make it hard to get right. So I'll say a little about
+why certain error/bugs are less likely in Clojure than in Java.
 
 [1] https://clojure.org/
 
@@ -360,3 +359,51 @@ them via `(boolean <java-Boolean>)`.
 
 -------------------------------------------------------------------
 
+# CollectionSideeffect
+
+    import static java.lang.System.*;
+    import java.util.*;
+
+    class CollectionSideeffect {
+
+        static List sort(List x) {
+
+            Collections.sort(x);
+            return x;
+
+        }
+
+        public static void main(String... args) {
+
+            List a = new ArrayList(Arrays.asList("b", "a", "c"));
+            List b = sort(a);
+            List c = a;
+
+            c.add(0, "d");
+
+            out.println(a);
+            out.println(b);
+            out.println(c);
+
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac CollectionSideeffect.java
+    ~/java-quiz$ java CollectionSideeffect 
+    [d, a, b, c]
+    [d, a, b, c]
+    [d, a, b, c]
+
+## Background
+
+This code is similar to the `ArraySideeffect` from
+above. `Collections.sort` is a mutator but we make it look like a
+_pure function_. So `a`, `b` and `c` all reference the __same__
+mutable `List`.
+
+In Clojure we have __immutable__ lists and vectors which can be sorted
+(like in `(sort [6 3 4])` which gives `(3 4 6)`).
+
+-------------------------------------------------------------------
