@@ -698,3 +698,41 @@ the first in the set -- "confusing".
 
 -------------------------------------------------------------------
 
+# NullCheck
+
+Which of the four _null-checks_ are "correct"? The code is supposed to
+check if the argument is `null`.
+
+    import static java.lang.System.*;
+
+    class NullCheck {
+
+        static Object NULL = null;
+
+        static void foo(Object x) {
+
+            if (NULL.equals(x)); // 1
+            if (x.equals(NULL)); // 2
+            if (x == NULL);      // 3
+            if (NULL == x);      // 4
+
+        }
+
+        public static void main(String... args) {
+
+            // foo(...);
+
+        }
+    }
+
+## Background
+
+Option `// 1` causes a `NullPointerException` since `NULL.equals()`
+de-references `null`. Option `// 2` will cause a
+`NullPointerException` in the case "x is null". So both are wrong.
+
+Options `// 3` and `// 4` both work.
+
+In Clojure you use `nil?` without trouble.
+
+-------------------------------------------------------------------
