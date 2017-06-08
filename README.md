@@ -343,11 +343,18 @@ Build & run:
 
 `Boolean` is not a Java 5 Enum class and thus we can use the `public`
 constructor to create instances. When comparing these via `==` for
-__identitiy__ they are different. `equals` and auto-un-boxing behave
-as expected.
+__identitiy__ they are different. `equals` and auto-(un)-boxing behave
+as expected (`Boolean.valueOf(boolean)` uses a cache which returns
+`Boolean.TRUE` and `Boolean.FALSE`).
 
-In Clojure you use the boolean [1] literals `true` and `false` (which are
-`Boolean.TRUE` and `Boolean.FALSE` ar runtime). Comparision is done via `=`.
+In Clojure you use the boolean [1] literals `true` and `false` (which
+are `Boolean/TRUE` and `Boolean/FALSE` at runtime). Test for equality
+is done via `=` but you usually use `true?` and `false?` and the fact
+that __only__ `nil` and `false` (or equally `Boolean/FALSE`) are
+`false?` and everything else (including `(Boolean. false)`) is
+`true?`. So when interacting with Java code you must be carefull when
+_receiving_ `Boolean` values from the Java-side -- you should convert
+them via `(boolean <java-Boolean>)`.
 
 [1] https://clojuredocs.org/clojure.core/boolean
 
