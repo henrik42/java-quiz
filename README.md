@@ -447,12 +447,12 @@ a class field on the heap) reference the same object but you can also
 have more than one reference __within__ a structure refering to the
 same object. This also introduces the possibility of side effects.
 
-So in this example we have `i` -- an array of `int[]`. So the elements
-of the array that `i` refers to are __references__ (not `int`s!).
+In this example we have `i` -- an array of `int[]`. The elements of
+the array that `i` refers to are __references__ (not `int`s!).
 
-So when we make `i[0]` and `i[1]` reference the same object (which is
-an `int[]` in this case) we can then change the `int`s in this array
-and _see_ the effect of the change in more than one place.
+After we make `i[0]` and `i[1]` reference the same object (which is an
+`int[]` in this case) we can change the `int`s in this array and _see_
+the effect of the change in more than one place.
 
 So side effects cannot only be introduced by returning argument
 reference values (see above) but also by constructing _co-refering_
@@ -469,6 +469,55 @@ _co-references_. This may lead to a different program behaviour.
 
 In Clojure you also have _co-references_ but since things are
 __immutable__ they cause no problem.
+
+-------------------------------------------------------------------
+
+# EnumQuiz
+
+    import static java.lang.System.*;
+
+    enum EnumQuiz {
+
+        FOO, BAR;
+
+        public static void main(String... args) {
+
+            Object a = FOO;
+            Object c = valueOf("FOO");
+            Object d = valueOf(EnumQuiz.class, "FOO");
+
+            out.println(a == FOO);
+            out.println(a.equals(FOO));
+            out.println(FOO.equals(a));
+
+            out.println(a == c);
+            out.println(a.equals(c));
+            out.println(c.equals(a));
+
+            out.println(a == d);
+            out.println(a.equals(d));
+            out.println(d.equals(a));
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac EnumQuiz.java
+    ~/java-quiz$ java EnumQuiz 
+    true
+    true
+    true
+    true
+    true
+    true
+    true
+    true
+    true
+
+# Background
+
+For every Enum you have exactly one instance. So you can use the
+identity check via `==` when comparing Enums.
 
 -------------------------------------------------------------------
 
