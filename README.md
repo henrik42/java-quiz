@@ -903,3 +903,80 @@ handles `null` (Clojure `nil`) without throwing. Clojure _interns_
 
 -------------------------------------------------------------------
 
+# TryCatchFinally
+
+    import static java.lang.System.*;
+
+    class TryCatchFinally {
+
+        public static void main(String... args) { 
+
+            out.println(foo(args)); 
+
+        }
+
+        public static int foo(String... args) {
+
+            int i = 0;
+
+            oops: try {
+
+                out.println("foo" + args[0]);
+                if (true)
+                    return i++;
+
+            } 
+            catch (Throwable t) {
+
+                out.println("catch");
+                return i++;
+
+            } 
+            finally {
+
+                out.println("finally" + i);
+                if (args.length > 0 && "foo".equals(args[0]))
+                    break oops;
+
+            }
+
+            out.println("done" + i);
+
+            return i;
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac TryCatchFinally.java
+    ~/java-quiz$ java TryCatchFinally    
+    catch
+    finally1
+    0
+
+    ~/java-quiz$ java TryCatchFinally foo
+    foofoo
+    finally1
+    done1
+    1
+
+    ~/java-quiz$ java TryCatchFinally bar
+    foobar
+    finally1
+    0
+
+## Background
+
+Maybe the `foo` case is the most surprising. `finally` can introduce
+its own _termination reason_ (via `return` or `break`). So eventhough
+the `try` block is terminated by `return` the `finally` block can
+_overrule_ this by `break`. The semantics (the question "when does it
+happen?")  of the post-increment (`return i++`) are also interesting.
+
+In Clojure we don't have `return` and `break` but we do habe
+`try/catch/finally`. `finally` is evaluated __only__ for side effects
+(like closing streams etc.) but __not__ for returning results. So the
+result of a `try/catch/finally` always comes from the `try` expression
+or the `catch` expression.
+
+-------------------------------------------------------------------
