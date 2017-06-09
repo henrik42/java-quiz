@@ -843,3 +843,63 @@ Build & run:
 
 -------------------------------------------------------------------
 
+# StringQuiz
+
+    import static java.lang.System.*;
+
+    class StringQuiz {
+
+        public static void main(String... args) {
+
+            String a = new String("a");
+            String b = new String("a");
+
+            out.println("a" == "a");
+            out.println(a == "a");
+            out.println(a == b);
+            out.println(a.equals(b));
+
+            a.concat("b");
+
+            out.println(a);
+            out.println(a == b);
+            out.println(a.equals(b));
+
+        }
+    }
+
+
+Build & run:
+
+    ~/java-quiz$ javac StringQuiz.java
+    ~/java-quiz$ java StringQuiz
+    true
+    false
+    false
+    true
+    a
+    false
+    true
+
+## Background
+
+`String` is immutable and so `a.concat("b")` doesn't change anything
+but returns a __new__ `String`. `String` literals are _interned_
+(i.e. _pooled_) and so `"a"` is __identical__ to `"a"` in `"a" == "a"`.
+
+Some developers misbelieve that `String` comparison can always be done
+by `==` (because `"a" == "a"`) since they do not know about _interned_
+`String`s.
+
+In Clojure you use `(= "a" x)` which behaves like `String.equals` but
+handles `null` (Clojure `nil`) without throwing. Clojure _interns_
+`String` literals as well.
+
+    (= "foo" "foo") ; -> true
+    (= nil "foo") ; -> false
+    (identical? "foo" "foo") ; -> true
+    (identical? (String. "foo") "foo") ; -> false
+    (identical? (.intern (String. "foo")) "foo") ; -> true
+
+-------------------------------------------------------------------
+
