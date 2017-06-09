@@ -973,10 +973,11 @@ the `try` block is terminated by `return` the `finally` block can
 _overrule_ this by `break`. The semantics (the question "when does it
 happen?")  of the post-increment (`return i++`) are also interesting.
 
-In Clojure we don't have `return` and `break` but we do habe
+In Clojure we don't have `return` and `break` but we do have
 `try/catch/finally`. `finally` is evaluated __only__ for side effects
 (like closing streams etc.) but __not__ for returning results. So the
 result of a `try/catch/finally` always comes from the `try` expression
 or the `catch` expression.
 
 -------------------------------------------------------------------
+
