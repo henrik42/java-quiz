@@ -75,8 +75,8 @@ different from `(x != null) & (x.foo())`.
 
 In Clojure there are no operators (and no operator precedence!). You
 use `and` [3], `or` (both with _short-circuit_ semantics), `bit-and`
-and `bit-or`. The names are clear and explicit. You won't confuse
-them.
+and `bit-or` (for integer numbers only though). The names are clear
+and explicit. You won't confuse them.
 
 [1] https://en.wikipedia.org/wiki/Short-circuit_evaluation  
 [2] https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html  
@@ -149,13 +149,38 @@ In Clojure you almost always use immutable data types (including
 immutable collections -- called _persistent data structures_ [2]). So
 there is no danger of side effects.
 
+A Clojure program that comes close to the structure of the Java
+program looks like this:
+
+    (defn main [& args]
+      (let [i [3 2 1]
+            k i
+            _ (println i)
+            _ (println k)
+            j (into [] (sort i))]
+        (println i)
+        (println j)
+        (println k)))
+
+And run (you'll need to get `clojure.jar`)
+
+    ~/java-quiz$ java -jar clojure.jar -i array-side-effect.clj -e '(main)'
+    [3 2 1]
+    [3 2 1]
+    [3 2 1]
+    [1 2 3]
+    [3 2 1]
+
+So only `j` is sorted -- no side effect.
+
 Note: Clojure can use Java's mutable arrays directly and in this case
 you get uncontrolled state sharing and side effects in Clojure as
-well.
+well [4].
 
 [1] https://en.wikipedia.org/wiki/Side_effect_(computer_science)  
 [2] https://clojure.org/reference/data_structures  
-[3] http://javadude.com/articles/passbyvalue.htm
+[3] http://javadude.com/articles/passbyvalue.htm  
+[4] https://clojuredocs.org/clojure.core/sort
 
 ## More on mutable state
 
