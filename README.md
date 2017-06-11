@@ -274,8 +274,14 @@ But:
   ordering semantics for `0.0`/`-0.0` and `NaN` [2] which may come as
   a surprise.
 
+In Clojure there is no auto-boxing since you're usually using the
+wrapper types only (see "Numbers" in [3]). But for Java-interop [4]
+there are ways to deal with native number types.
+
 [1] https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html#valueOf-int-  
-[2] https://docs.oracle.com/javase/8/docs/api/java/lang/Double.html#equals-java.lang.Object-
+[2] https://docs.oracle.com/javase/8/docs/api/java/lang/Double.html#equals-java.lang.Object-  
+[3] https://clojure.org/api/cheatsheet  
+[4] https://clojure.org/reference/java_interop
 
 -------------------------------------------------------------------
 
