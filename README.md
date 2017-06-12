@@ -8,9 +8,10 @@ some code examples they could use to check their knowledge. We don't
 use these for job interviews yet.
 
 I'll add some comments and Clojure [1] code. Clojure is a LISP-like
-functional JVM language. I love Java but I believe it has some
-properties that make it hard to get right. So I'll say a little about
-why certain error/bugs are less likely in Clojure than in Java.
+functional JVM language. I love Java (and adore Clojure) but I believe
+it has some properties that make it hard to get right. So I'll say a
+little about why certain error/bugs are less likely in Clojure than in
+Java.
 
 [1] https://clojure.org/
 
@@ -133,26 +134,29 @@ array. All variables refer to the __same__ mutable array.
 
 Many developers do not understand the difference between the
 object/instance (the array in this case) and the reference(s) to such
-an object. Java uses __by value__ semantics [3] but this description
-leads some developers to believe that `sort(i)` will pass the
-object/value/array to the method and not just the reference to that
-object/value/array.
+an object. Java uses __by value__ semantics [3] but this
+description/term leads some developers to believe that `sort(i)` will
+pass the object/value/array to the method and not just the
+__reference__ to that object/value/array.
 
 Here we introduce the `sort` method to further trick the reader: it
 looks like a _pure function_, but it just returns its argument
 (i.e. the reference to the mutable array) -- well, thank's for that!
 This kind of error (i.e. introducing side effects via state sharing
-between arguments and return values) is done quite often by delevopers
-unintentionally and hard to find.
+between arguments and return values) is done quite often by developers
+unintentionally and these errors are hard to find.
 
 In Clojure you almost always use immutable data types (including
 immutable collections -- called _persistent data structures_ [2]). So
-there is no danger of side effects.
+there is no danger of side effects. In Clojure __state__ is managed by
+several __mutable reference types__. But the values (like lists and
+maps) are kept __immutable__. So it's always safe to pass/receive
+values to/from functions.
 
 A Clojure program that comes close to the structure of the Java
-program looks like this:
+program from above looks like this:
 
-    (defn main [& args]
+    (defn main []
       (let [i [3 2 1]
             k i
             _ (println i)
@@ -162,7 +166,7 @@ program looks like this:
         (println j)
         (println k)))
 
-And run (you'll need to get `clojure.jar`)
+And run (you'll need to get `clojure.jar`):
 
     ~/java-quiz$ java -jar clojure.jar -i array-side-effect.clj -e '(main)'
     [3 2 1]
@@ -315,7 +319,7 @@ not know that and misbelieve that `BigInteger.add()` changes the
 `Integer` instance.
 
 In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
-1)`.
+1)`).
 
 -------------------------------------------------------------------
 
@@ -381,7 +385,7 @@ In Clojure you use the boolean [1] literals `true` and `false` (which
 are `Boolean/TRUE` and `Boolean/FALSE` at runtime). Test for equality
 is done via `=` but you usually use `true?` and `false?` and the fact
 that __only__ `nil` and `false` (or equally `Boolean/FALSE`) are
-`false?` and everything else (including `(Boolean. false)`) is
+`false?` and everything else (__including__ `(Boolean. false)`) is
 `true?`. So when interacting with Java code you must be carefull when
 _receiving_ `Boolean` values from the Java-side -- you should convert
 them via `(boolean <java-Boolean>)`.
@@ -474,7 +478,7 @@ Build & run:
 # Background
 
 You cannot only have more than one variable (local on the stack or as
-a class field on the heap) reference the same object but you can also
+a class' field on the heap) reference the same object but you can also
 have more than one reference __within__ a structure refering to the
 same object. This also introduces the possibility of side effects.
 
@@ -495,11 +499,12 @@ their interfaces. When a service is called locally or through a remote
 __RMI client__, _co-refering_ object graphs will hit the
 server/implemenation (since RMI's de-serialization preserves the
 _co-refering_ graph-structure). But once you switch to REST or SOAP
-clients the server will see a structure without any
-_co-references_. This may lead to a different program behaviour.
+clients the server will see a structure without any _co-references_
+(which you could call __by value__ semantics -- see above). This may
+lead to a different program behaviour.
 
-In Clojure you also have _co-references_ but since things are
-__immutable__ they cause no problem.
+In Clojure you also have _co-references_ (i.e. _sharing_) but since
+things are __immutable__ this causes no problem.
 
 -------------------------------------------------------------------
 
@@ -549,6 +554,9 @@ Build & run:
 
 For every Enum you have exactly one instance. So you can use the
 identity check via `==` when comparing Enums.
+
+Clojure does not support Enums well. You can use the Java Enums but
+you cannot easely define them. You use namespaced names/vars instead.
 
 -------------------------------------------------------------------
 
@@ -725,14 +733,15 @@ Build & run:
 
 Mutable keys are bad for you (`HashSet`, `HashMap`, `TreeSet`). The
 set does not `contains` the element (a `List` in this case) which is
-the first in the set -- "confusing".
+its first element -- "confusing".
 
 -------------------------------------------------------------------
 
 # NullCheck
 
 Which of the four _null-checks_ are "correct"? The code is supposed to
-check if the argument is `null`.
+check if the argument is `null` (like in a check to prevent a
+`NullPointerException` when re-referencing `x`).
 
     import static java.lang.System.*;
 
@@ -823,6 +832,10 @@ _Overloading_ and _overriding_ are confused by many developers. One of
 the frequent error is that developers believe that `a.foo("foo")`
 calls `A.foo(String)` which it doesn't. But in `new A().foo("fred")`
 it does -- of course.
+
+In Clojure you use "interfaces" (_protocols_) and implemenations for
+these. But usually you do not use inheritence much. For Java-interop
+you can extends Java classes without trouble.
 
 -------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-(defn main [& args]
+(defn main []
   (let [i [3 2 1]
         k i
         _ (println i)
