@@ -632,7 +632,50 @@ developers. I didn't even put `break` and `continue` __with labels__
 about).
 
 In Clojure you use _recusive looping_ [1] [2], the sequence
-abstraction and list comprehension.
+abstraction and list comprehension. For example:
+
+* Produce output 1..4:
+
+        (for [i (range 1 5)]
+            (println i))
+
+* Do not output 2 -- produces 1,3,4.
+
+        (doseq [i (remove #{2} (range 1 5))]
+            (println i))
+
+* Do not output 2 and 3 -- produces 1,4.
+
+        (doseq [i (remove #{2 3} (range 1 5))]
+            (println i))
+
+* Produce until 3 -- produces 1,2.
+
+        (doseq [i (take-while #(not (#{3} %)) (range 1 5))]
+            (println i))
+
+  or
+
+        (doseq [i (range 1 5)
+                :while (not (#{3} i))]
+          (println i))
+
+If you want to really control the _loop variable_ you can use
+`loop`. This produces 1,2,3:
+
+    (loop [i 1]
+      (when (<= i 3)
+        (println i)
+        (recur (inc i))))
+
+In none of these examples you have a mutable __variable__ which could
+be used outside of the loop by mistake. All you get is successive
+__bindings__ of a name to different __immutable__ values.
+
+_Early returns_ are _imperative trickery_. In Clojure the semantics of
+execution follow the structure of code much more than in Java. Things
+like _early returns_, `break` or `continue` are only _structured
+gotos_ which you cannot do in Clojure.
 
 [1] https://clojure.org/about/functional_programming#_recursive_looping  
 [2] https://en.wikibooks.org/wiki/Clojure_Programming/Examples/Cookbook#Looping
