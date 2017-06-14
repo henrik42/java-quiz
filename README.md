@@ -319,7 +319,11 @@ not know that and misbelieve that `BigInteger.add()` changes the
 `Integer` instance.
 
 In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
-1)`).
+1)`). Note that Clojure has built-in literals for `BigDecimal` (not
+`BigInteger` though):
+
+    (+ 1.20M 1.4M) ; -> 2.60M
+    (type 2.60M)   ; -> java.math.BigDecimal
 
 -------------------------------------------------------------------
 
@@ -382,13 +386,14 @@ as expected (`Boolean.valueOf(boolean)` uses a cache which returns
 `Boolean.TRUE` and `Boolean.FALSE`).
 
 In Clojure you use the boolean [1] literals `true` and `false` (which
-are `Boolean/TRUE` and `Boolean/FALSE` at runtime). Test for equality
-is done via `=` but you usually use `true?` and `false?` and the fact
-that __only__ `nil` and `false` (or equally `Boolean/FALSE`) are
-`false?` and everything else (__including__ `(Boolean. false)`) is
-`true?`. So when interacting with Java code you must be carefull when
-_receiving_ `Boolean` values from the Java-side -- you should convert
-them via `(boolean <java-Boolean>)`.
+are `java.lang.Boolean/TRUE` and `java.lang.Boolean/FALSE` at
+runtime). Test for equality is done via `=` but you usually use
+`true?` and `false?` and the fact that __only__ `nil` and `false` (or
+equally `Boolean/FALSE`) are `false?` and everything else
+(__including__ `(Boolean. false)`) is `true?`. So when interacting
+with Java code you must be carefull when _receiving_ `Boolean` values
+from the Java-side -- you should convert them via `(boolean
+<java-Boolean>)`.
 
 [1] https://clojuredocs.org/clojure.core/boolean
 
@@ -480,7 +485,9 @@ Build & run:
 You cannot only have more than one variable (local on the stack or as
 a class' field on the heap) reference the same object but you can also
 have more than one reference __within__ a structure refering to the
-same object. This also introduces the possibility of side effects.
+same object (note that this means you have to expect cyclic structures
+and even objects with __references to themselves__!). This also
+introduces the possibility of side effects.
 
 In this example we have `i` -- an array of `int[]`. The elements of
 the array that `i` refers to are __references__ (not `int`s!).
