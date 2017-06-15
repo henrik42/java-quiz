@@ -327,6 +327,117 @@ In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
 
 -------------------------------------------------------------------
 
+# NumbersQuiz
+
+TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+## Background
+
+When comparing a `float` value against a `double` value Java converts
+the `float` value to a `double` value (not the other way around!). You
+can check by looking at the byte-code of `CompareFloatAndDouble.java`.
+
+    import static java.lang.System.*;
+
+    class CompareFloatAndDouble {
+
+        public static void main(String... args) {
+
+            double d = Double.parseDouble(args[0]);
+            float f = (float) d;
+            boolean b = d == f;
+
+            out.println("d="+d+"/"+String.format("%16X", Double.doubleToRawLongBits(d)));
+            out.println("f="+f+"/"+String.format("%08X", Float.floatToRawIntBits(f)));
+            out.println("b="+b);
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac CompareFloatAndDouble.java
+    
+    ~/java-quiz$ java CompareFloatAndDouble 0.5
+    d=0.5/3FE0000000000000
+    f=0.5/3F000000
+    b=true
+    
+    ~/java-quiz$ java CompareFloatAndDouble 0.2
+    d=0.2/3FC999999999999A
+    f=0.2/3E4CCCCD
+    b=false
+
+Now look at the byte-code:
+
+    ~/java-quiz$ javap -v CompareFloatAndDouble
+         [...]
+         0: aload_0       
+         1: iconst_0      
+         2: aaload        
+         3: invokestatic  #2                  // Method java/lang/Double.parseDouble:(Ljava/lang/String;)D
+         6: dstore_1
+         
+Here the `float` value gets converted.
+
+         7: dload_1       
+         8: d2f           
+         9: fstore_3
+
+Here the `float` value gets converted (back) to a `double` ...
+
+        10: dload_1       
+        11: fload_3
+        
+        12: f2d
+
+... and the two `double` values are compared.
+
+        13: dcmpl         
+        14: ifne          21
+        17: iconst_1      
+        18: goto          22
+        21: iconst_0      
+        22: istore        4
+        24: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        [...]
+        
+Looking at the _bit-representation_ of the `float` and the `double`
+values you can tell that the values for `0.5` look a lot more alike
+than the values for `0.2` (details can be found in the IEEE 754 binary
+floating point standard).
+
+## More on numbers
+
+In Java you have a bunch of _numerical types_:
+
+* `float`/`double`: 32- and 64-bit floating-point numbers. You have
+  numerical literals for these types (e.g `4.2` and `4.2d` are
+  `double` literals and `4.2f` is a `float` literal).
+
+* `Float`/`Double`: __immutable__ `java.lang` wrapper classes (compare
+  "Autoboxing"). Note that these have no arithmetic functions/methods
+  (like `add`). Arithmetics is done by __unboxing__ and using the
+  built-in operators (like `+` and `*`).
+
+* `int`/`long`: 32- and 64-bit signed integer numbers.
+
+* `Integer`/`Long`: __immutable__ wrapper classes -- again with no
+  arithmetic api.
+
+* `BigInteger`: 
+
+* `BigDecimal`:
+
+You can convert between types: (implicit conversion!!!)
+
+There are built-in operators and methods:
+
+* safe math - overflow
+
+In Clojure most of the _type machinery_ is hidden from you.
+
+-------------------------------------------------------------------
+
 # BooleanQuiz
 
     import static java.lang.System.*;
