@@ -327,11 +327,94 @@ In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
 
 -------------------------------------------------------------------
 
-# NumbersQuiz
+# NumberQuiz
 
-TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    import static java.lang.System.*;
+
+    class NumberQuiz {
+
+        public static void main(String... args) {
+
+            out.println("A:" + (0.2 == 0.2f));
+            out.println("B:" + (0.5 == 0.5f));
+
+            out.println("C:" + (0.0 == 0.0f));
+            out.println("D:" + (0.0 == -0.0f));
+            out.println("E:" + (0.0 == -0.0));
+
+            out.println("F:" + new Double(0.0).equals(0.0f));
+            out.println("G:" + new Double(0.0).equals(-0.0f));
+            out.println("H:" + new Double(0.0).equals(-0.0));
+
+            out.println("I:" + (Double.NaN == Double.NaN));
+            out.println("J:" + (Double.NaN > 0.0));
+            out.println("K:" + (Double.NaN < 0.0));
+
+            out.println("L:" + (new Double(Double.NaN).equals(Double.NaN)));
+            out.println("M:" + (new Double(0.0).compareTo(Double.NaN)));
+
+            short s = (short) (Short.MAX_VALUE + 1);
+
+            out.println("N:" +  Short.MAX_VALUE);
+            out.println("O:" + (Short.MAX_VALUE + 1));
+            out.println("P:" + s);
+
+            out.println("Q:" + Integer.MAX_VALUE);
+            out.println("R:" + (Integer.MAX_VALUE + 1));
+
+        }
+    }
+
+Build & run:
+
+    ~/java-quiz$ javac NumberQuiz.java
+    ~/java-quiz$ java NumberQuiz
+    A:false
+    B:true
+    C:true
+    D:true
+    E:true
+    F:false
+    G:false
+    H:false
+    I:false
+    J:false
+    K:false
+    L:true
+    M:-1
+    N:32767
+    O:32768
+    P:-32768
+    Q:2147483647
+    R:-2147483648
 
 ## Background
+
+Floating point numbers cannot represent all decimal numbers exactly
+(see IEEE 754 below). `0.5` can be represented exactly (because it is
+a division of `1` by a power of `2`) and conversion from `float` to
+`double` introduces no error (see below). `0.2` cannot be represented
+this way. When converting `float` to `double` an error is introduced
+(see below).
+
+`0.0` and `-0.0` are considered being equal for `double` eventhough
+their bit representations are not. Comparing against `float`
+(i.e. conversion to `double`) introduces no error -- so they're equal.
+
+Not so for `Double`! `0.0` and `-0.0` and `Float`s are all
+__non-equal__.
+
+For `NaN` (_not a number_) it's different: `NaN` is not even equal to
+itself (like `NULL` in databases is not `= NULL` but `IS NULL` is used
+for testing for `NULL`). Then again it's different for `Double`.
+
+Integer number types have some strange properties as well: they _wrap
+around_ when they reach their `MIN_VALUE`/`MAX_VALUE`. Note that there
+is one more negative value than there are positive values. In the
+expression `Short.MAX_VALUE + 1` the `short` value is converted to
+`int` and then `1` is added. So there is no _wrap around_.
+
+## Conversion
 
 When comparing a `float` value against a `double` value Java converts
 the `float` value to a `double` value (not the other way around!). You
@@ -347,9 +430,14 @@ can check by looking at the byte-code of `CompareFloatAndDouble.java`.
             float f = (float) d;
             boolean b = d == f;
 
-            out.println("d="+d+"/"+String.format("%16X", Double.doubleToRawLongBits(d)));
-            out.println("f="+f+"/"+String.format("%08X", Float.floatToRawIntBits(f)));
+            double fd = f;
+
+            out.println("d ="+d+"/"+String.format("%016X", Double.doubleToRawLongBits(d)));
+            out.println("f ="+f+"/"+String.format("%08X", Float.floatToRawIntBits(f)));
+            out.println("fd="+fd+"/"+String.format("%016X", Double.doubleToRawLongBits(fd)));
+
             out.println("b="+b);
+
         }
     }
 
@@ -358,14 +446,34 @@ Build & run:
     ~/java-quiz$ javac CompareFloatAndDouble.java
     
     ~/java-quiz$ java CompareFloatAndDouble 0.5
-    d=0.5/3FE0000000000000
-    f=0.5/3F000000
+    d =0.5/3FE0000000000000
+    f =0.5/3F000000
+    fd=0.5/3FE0000000000000
     b=true
-    
+
     ~/java-quiz$ java CompareFloatAndDouble 0.2
-    d=0.2/3FC999999999999A
-    f=0.2/3E4CCCCD
+    d =0.2/3FC999999999999A
+    f =0.2/3E4CCCCD
+    fd=0.20000000298023224/3FC99999A0000000
     b=false
+
+    ~/java-quiz$ java CompareFloatAndDouble NaN
+    d =NaN/7FF8000000000000
+    f =NaN/7FC00000
+    fd=NaN/7FF8000000000000
+    b=false
+
+    ~/java-quiz$ java CompareFloatAndDouble 0.0
+    d =0.0/0000000000000000
+    f =0.0/00000000
+    fd=0.0/0000000000000000
+    b=true
+
+    ~/java-quiz$ java CompareFloatAndDouble -0.0
+    d =-0.0/8000000000000000
+    f =-0.0/80000000
+    fd=-0.0/8000000000000000
+    b=true
 
 Now look at the byte-code:
 
@@ -377,20 +485,19 @@ Now look at the byte-code:
          3: invokestatic  #2                  // Method java/lang/Double.parseDouble:(Ljava/lang/String;)D
          6: dstore_1
          
-Here the `float` value gets converted.
+Here the `double` value gets converted to `float` (`d2f`):
 
          7: dload_1       
          8: d2f           
          9: fstore_3
 
-Here the `float` value gets converted (back) to a `double` ...
+Here the `float` value gets converted (back) to a `double` (`f2d`) ...
 
         10: dload_1       
         11: fload_3
-        
         12: f2d
 
-... and the two `double` values are compared.
+... and the two `double` values are compared (`dcmpl`):
 
         13: dcmpl         
         14: ifne          21
@@ -398,13 +505,16 @@ Here the `float` value gets converted (back) to a `double` ...
         18: goto          22
         21: iconst_0      
         22: istore        4
-        24: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        24: fload_3       
+        25: f2d           
+        26: dstore        5
+        28: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
         [...]
         
 Looking at the _bit-representation_ of the `float` and the `double`
 values you can tell that the values for `0.5` look a lot more alike
-than the values for `0.2` (details can be found in the IEEE 754 binary
-floating point standard).
+than the values for `0.2` (details can be found in the "IEEE 754 binary
+floating point standard").
 
 ## More on numbers
 
@@ -412,12 +522,18 @@ In Java you have a bunch of _numerical types_:
 
 * `float`/`double`: 32- and 64-bit floating-point numbers. You have
   numerical literals for these types (e.g `4.2` and `4.2d` are
-  `double` literals and `4.2f` is a `float` literal).
+  `double` literals and `4.2f` is a `float` literal). When
+  mixing/using these types in an expression (like `+`, `<` and `==`)
+  the Java compiler inserts code to convert values. Conversion can be
+  done explicitly by casting (like in `float f =
+  (float) 2.0`). Casting (i.e. conversion) is a __lossy operation__.
 
 * `Float`/`Double`: __immutable__ `java.lang` wrapper classes (compare
   "Autoboxing"). Note that these have no arithmetic functions/methods
-  (like `add`). Arithmetics is done by __unboxing__ and using the
-  built-in operators (like `+` and `*`).
+  (like `add`). Arithmetics is done by __unboxing__ to the native
+  types (`double` and `float`) and using the built-in operators (like
+  `+` and `*`). Note that checks for equality are done by `equals`
+  (not `==`) and comparison is done by `compareTo` (not `<`/`>`).
 
 * `int`/`long`: 32- and 64-bit signed integer numbers.
 
@@ -427,8 +543,6 @@ In Java you have a bunch of _numerical types_:
 * `BigInteger`: 
 
 * `BigDecimal`:
-
-You can convert between types: (implicit conversion!!!)
 
 There are built-in operators and methods:
 

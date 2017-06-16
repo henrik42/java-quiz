@@ -8,8 +8,12 @@ class CompareFloatAndDouble {
         float f = (float) d;
         boolean b = d == f;
 
-        out.println("d="+d+"/"+String.format("%16X", Double.doubleToRawLongBits(d)));
-        out.println("f="+f+"/"+String.format("%08X", Float.floatToRawIntBits(f)));
+        double fd = f;
+
+        out.println("d ="+d+"/"+String.format("%016X", Double.doubleToRawLongBits(d)));
+        out.println("f ="+f+"/"+String.format("%08X", Float.floatToRawIntBits(f)));
+        out.println("fd="+fd+"/"+String.format("%016X", Double.doubleToRawLongBits(fd)));
+
         out.println("b="+b);
 
     }
