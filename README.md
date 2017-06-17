@@ -338,6 +338,12 @@ In Clojure you use `+`, `-`, `*` and `/` as you expect (like in `(+ a
             out.println("A:" + (0.2 == 0.2f));
             out.println("B:" + (0.5 == 0.5f));
 
+            float sf = 0.2f + 0.2f + 0.2f;
+            double sd = 0.2 + 0.2 + 0.2;
+
+            out.println("sf:" + sf);
+            out.println("sd:" + sd);
+
             out.println("C:" + (0.0 == 0.0f));
             out.println("D:" + (0.0 == -0.0f));
             out.println("E:" + (0.0 == -0.0));
@@ -371,6 +377,8 @@ Build & run:
     ~/java-quiz$ java NumberQuiz
     A:false
     B:true
+    sf:0.6
+    sd:0.6000000000000001
     C:true
     D:true
     E:true
@@ -393,9 +401,12 @@ Build & run:
 Floating point numbers cannot represent all decimal numbers exactly
 (see IEEE 754 below). `0.5` can be represented exactly (because it is
 a division of `1` by a power of `2`) and conversion from `float` to
-`double` introduces no error (see below). `0.2` cannot be represented
-this way. When converting `float` to `double` an error is introduced
-(see below).
+`double` introduces no error ("Widening Primitive Conversion"; see
+[1]). `0.2` cannot be represented this way. When converting `float` to
+`double` an _error_ is introduced.
+
+Funny: when adding up `0.2f` values the result seems _more exact_ than
+when adding up `0.2d` (but this is not true for all/any values).
 
 `0.0` and `-0.0` are considered being equal for `double` eventhough
 their bit representations are not. Comparing against `float`
@@ -413,6 +424,8 @@ around_ when they reach their `MIN_VALUE`/`MAX_VALUE`. Note that there
 is one more negative value than there are positive values. In the
 expression `Short.MAX_VALUE + 1` the `short` value is converted to
 `int` and then `1` is added. So there is no _wrap around_.
+
+[1] https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html
 
 ## Conversion
 
@@ -513,42 +526,11 @@ Here the `float` value gets converted (back) to a `double` (`f2d`) ...
         
 Looking at the _bit-representation_ of the `float` and the `double`
 values you can tell that the values for `0.5` look a lot more alike
-than the values for `0.2` (details can be found in the "IEEE 754 binary
-floating point standard").
+than the values for `0.2` (details can be found in the "IEEE 754 –
+IEEE Standard for Binary Floating-Point Arithmetic for microprocessor
+systems (ANSI/IEEE Std 754-1985/IEEE 754-2008)" [1]).
 
-## More on numbers
-
-In Java you have a bunch of _numerical types_:
-
-* `float`/`double`: 32- and 64-bit floating-point numbers. You have
-  numerical literals for these types (e.g `4.2` and `4.2d` are
-  `double` literals and `4.2f` is a `float` literal). When
-  mixing/using these types in an expression (like `+`, `<` and `==`)
-  the Java compiler inserts code to convert values. Conversion can be
-  done explicitly by casting (like in `float f =
-  (float) 2.0`). Casting (i.e. conversion) is a __lossy operation__.
-
-* `Float`/`Double`: __immutable__ `java.lang` wrapper classes (compare
-  "Autoboxing"). Note that these have no arithmetic functions/methods
-  (like `add`). Arithmetics is done by __unboxing__ to the native
-  types (`double` and `float`) and using the built-in operators (like
-  `+` and `*`). Note that checks for equality are done by `equals`
-  (not `==`) and comparison is done by `compareTo` (not `<`/`>`).
-
-* `int`/`long`: 32- and 64-bit signed integer numbers.
-
-* `Integer`/`Long`: __immutable__ wrapper classes -- again with no
-  arithmetic api.
-
-* `BigInteger`: 
-
-* `BigDecimal`:
-
-There are built-in operators and methods:
-
-* safe math - overflow
-
-In Clojure most of the _type machinery_ is hidden from you.
+[1] https://en.wikipedia.org/wiki/IEEE_floating_point
 
 -------------------------------------------------------------------
 

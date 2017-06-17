@@ -7,6 +7,12 @@ class NumberQuiz {
         out.println("A:" + (0.2 == 0.2f));
         out.println("B:" + (0.5 == 0.5f));
 
+        float sf = 0.2f + 0.2f + 0.2f;
+        double sd = 0.2 + 0.2 + 0.2;
+
+        out.println("sf:" + sf);
+        out.println("sd:" + sd);
+        
         out.println("C:" + (0.0 == 0.0f));
         out.println("D:" + (0.0 == -0.0f));
         out.println("E:" + (0.0 == -0.0));
